@@ -1,31 +1,47 @@
 {
   "name": "bitwatcher",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "serve": "vue-cli-service serve ./example/main.js --open",
+    "build": "vue-cli-service build --name bitwatcher --entry ./src/index.js --target lib",
     "lint": "vue-cli-service lint",
+    "doc:build": "npx vuedoc.md --section API --output ./README.md ./src/components/Invoice.vue",
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps"
+    "postuninstall": "electron-builder install-app-deps",
+    "prepublishOnly": "npm run lint && npm run build && npm run doc:build"
   },
-  "main": "background.js",
+  "main": "dist/bitwatcher.umd.js",
+  "module": "dist/bitwatcher.common.min.js",
+  "files": [
+    "dist/*.css",
+    "dist/*.map",
+    "dist/*.js",
+    "src/*"
+  ],
   "dependencies": {
+    "bootstrap-vue": "^2.0.0-rc.14",
+    "jquery": "^3.3.1",
     "vue": "^2.6.6",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {
+    "@babel/polyfill": "^7.2.5",
     "@vue/cli-plugin-babel": "^3.5.0",
     "@vue/cli-plugin-eslint": "^3.5.0",
     "@vue/cli-service": "^3.5.0",
+    "@vuedoc/md": "^1.5.0",
     "babel-eslint": "^10.0.1",
+    "component-fixture": "^0.4.1",
     "electron": "^4.0.0",
     "eslint": "^5.8.0",
     "eslint-plugin-vue": "^5.0.0",
     "node-sass": "^4.11.0",
     "sass-loader": "^7.1.0",
+    "vue-cli-plugin-bootstrap-vue": "^0.2.0",
+    "vue-cli-plugin-component": "^1.10.5",
     "vue-cli-plugin-electron-builder": "^1.1.3",
     "vue-template-compiler": "^2.5.21"
   },
@@ -52,5 +68,9 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
+  ],
+  "keywords": [
+    "vue",
+    "component"
   ]
 }
