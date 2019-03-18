@@ -1,15 +1,26 @@
 <template>
   <div class="configuration">
-    <h1>Printer</h1>
-    <b-button v-on:click="handlerPrint">Print on {{defaultPrinter.name}}</b-button>
-    <b-list-group>
-      <b-list-group-item
-        v-for="printer in printers"
-        v-bind:class="{
+    <b-container>
+      <b-row>
+        <b-col>
+          <h1>Point of sale printer</h1>
+          <b-form-select v-model="selected">
+            <option :value="printer.name" v-for="printer in printers">{{printer.name}}</option>
+          </b-form-select>
+        </b-col>
+        <b-col>
+          <b-list-group>
+            <b-list-group-item
+              v-for="printer in printers"
+              v-bind:class="{
           active: printer.isDefault
         }"
-      >{{printer.name}}</b-list-group-item>
-    </b-list-group>
+            >{{printer.name}}</b-list-group-item>
+          </b-list-group>
+        </b-col>
+      </b-row>
+    </b-container>
+    <b-button v-on:click="handlerPrint">Print on {{defaultPrinter.name}}</b-button>
   </div>
 </template>
 
@@ -19,7 +30,9 @@ export default {
     return {
       receiptPrinter: {},
       defaultPrinter: {},
-      printers: []
+      printers: [],
+      options: [],
+      selected: ""
     };
   },
   beforeDestroy() {},
@@ -30,14 +43,15 @@ export default {
 
     let win = this.initPrintWindow();
     let printers = win.webContents.getPrinters();
-
     if (printers) {
+      this.options = this.printers.map(function(printer) {
+        return { value: printer.name, text: printer.name };
+      });
       this.defaultPrinter = printers.filter(function(p) {
         return p.isDefault;
       })[0];
       this.printers = printers;
     }
-
     win.close();
   },
   methods: {
