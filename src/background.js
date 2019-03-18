@@ -4,8 +4,6 @@ import {
   app,
   protocol,
   BrowserWindow,
-  ipcMain,
-  ipcRenderer
 } from 'electron'
 import {
   createProtocol,
@@ -16,46 +14,35 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
-let printerList
 
 // Standard scheme must be registered before the app is ready
 protocol.registerStandardSchemes(['app'], {
   secure: true
 })
 
-ipcMain.on('doorBell', (event, arg) => {
-  console.log(arg); // 'ding'
-  event.returnValue = 'dong';
-  ipcMain.emit('dong', 'yay');
-});
-
-
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    width: 800,
+    width: 960,
     height: 600,
     x: 0,
     y: 0,
     webPreferences: {
       webSecurity: true
-    }
+    },
   })
 
-  win.setMenuBarVisibility(false)
+  //win.setMenuBarVisibility(false)
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
     if (!process.env.IS_TEST) win.webContents.openDevTools() // Disabled this because it annoyed me
   } else {
-    printerList = win.webContents.getPrinters()
-    app.printerList = win.webContents.getPrinters()
     createProtocol('app')
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
 
   }
-
   win.on('closed', () => {
     win = null
   })
@@ -107,11 +94,3 @@ if (isDevelopment) {
     })
   }
 }
-
-ipcMain.on('request:system-printers', function (event, arg) {
-  console.log('Requesting printers')
-  let printers = win.webContents.getPrinters();
-  win.webContents.send('receive:system-printers', {
-    printers
-  });
-})

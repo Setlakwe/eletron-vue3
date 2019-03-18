@@ -1,31 +1,67 @@
 <template>
-  <div class="configuration">!
-    <b-button v-on:click="getPrinters()">Show printers</b-button>
-    <div>{{printerList}}</div>
+  <div class="configuration">
+    <h1>Printer</h1>
+    <b-button v-on:click="handlerPrint">Print on {{defaultPrinter.name}}</b-button>
+    <b-list-group>
+      <b-list-group-item
+        v-for="printer in printers"
+        v-bind:class="{
+          active: printer.isDefault
+        }"
+      >{{printer.name}}</b-list-group-item>
+    </b-list-group>
   </div>
 </template>
 
 <script>
-import { ipcRenderer } from "electron";
-let myval;
 export default {
-  mounted() {
-    ipcRenderer.send("request:system-printers");
-  },
   data() {
     return {
-      currentPrinter: {},
-      printerList: []
+      receiptPrinter: {},
+      defaultPrinter: {},
+      printers: []
     };
   },
+  beforeDestroy() {},
+  computed: {},
+  mounted() {
+    if (localStorage.receptPrinter)
+      this.receiptPrinter = localStorage.receptPrinter;
+
+    let win = this.initPrintWindow();
+    let printers = win.webContents.getPrinters();
+
+    if (printers) {
+      this.defaultPrinter = printers.filter(function(p) {
+        return p.isDefault;
+      })[0];
+      this.printers = printers;
+    }
+
+    win.close();
+  },
   methods: {
-    init() {
-      ipcRenderer.on("receive:system-printers", function(e, data) {
-        this.printerList = data.printers;
+    initPrintWindow: function() {
+      // Creating new print window
+      const { BrowserWindow } = require("electron").remote;
+      let win = new BrowserWindow({
+        "auto-hide-menu-bar": true,
+        show: false
       });
+      win.on("closed", function() {
+        win = null;
+      });
+      return win;
     },
-    getPrinters() {
-      console.log(Date.now(), this.printerList);
+    handlerPrint: function() {
+      let win = this.initPrintWindow();
+      win.loadURL("http://google.com");
+      win.webContents.on("did-finish-load", () => {
+        let options = { silent: true, deviceName: this.defaultPrinter.name };
+        win.webContents.print(options, function() {
+          win.close();
+        });
+      });
     }
   }
 };
