@@ -1,28 +1,129 @@
 <template>
   <b-container fluid>
-    <b-form>
-      <b-col>
-        <b-form-group id="nameGroup" label="Nom:" label-for="name" class="form-group row col-2">
-          <b-form-input id="name" type="text" required placeholder="Entrez le nom"/>
-        </b-form-group>
-        <b-form-group id="phoneGroup" label="Télphone:" label-for="phone" class="form-group row">
-          <b-form-input id="phone" type="phone" required placeholder="Entrez # de téléphone"/>
-        </b-form-group>
-        <b-form-group id="emailGroup" label="Courriel:" label-for="email" class="form-group row">
-          <b-form-input id="email" type="email" required placeholder="Votre Courriel"/>
-        </b-form-group>
-        <b-form-group
-          id="address1Group"
-          label="Adresse:"
-          label-for="address1"
-          class="form-group row"
-        >
-          <b-form-input id="address1" type="text" required placeholder="Entrez l'adresse"/>
-          <b-form-input id="address2" type="text" required placeholder/>
-          <b-form-input id="address3" type="text" required placeholder="Entrez la ville"/>
-        </b-form-group>
+    <h1>Facturation</h1>
+    <!-- <b-form> -->
+    <b-form-row>
+      <b-col sm="6">
+        <b-row class="my-1" v-for="field in customer.fields" :key="field.name">
+          <b-col sm="3" class="text-right">
+            <label :for="`type-${field.name}`">
+              {{ field.label }}
+              <span v-if="field.required">*</span>
+            </label>
+          </b-col>
+          <b-col sm="9">
+            <b-form-input
+              :id="`type-${field.name}`"
+              :type="field.type"
+              :aria-invalid="field.required"
+              :placeholder="field.placeholder"
+              :maxlength="field.maxlength || 255"
+            />
+          </b-col>
+        </b-row>
       </b-col>
-    </b-form>
-    <b-col>AA</b-col>
+      <b-col sm="6">
+        <b-row class="my-1" v-for="field in customer.fields" :key="field.name">
+          <b-col sm="3" class="text-right">
+            <label :for="`type-${field.name}`">
+              {{ field.label }}
+              <span v-if="field.required">*</span>
+            </label>
+          </b-col>
+          <b-col sm="9">
+            <form>
+              <b-form-input
+                :id="`type-${field.name}`"
+                :type="field.type"
+                :aria-invalid="field.required"
+                :placeholder="field.placeholder"
+                :maxlength="field.maxlength || 255"
+                pattern="`${field.pattern}`"
+              />
+              <input type="submit" value=">>">
+            </form>
+          </b-col>
+        </b-row>
+      </b-col>
+    </b-form-row>
+    <!-- </b-form> -->
+    <b-row class="my-1" v-for="type in types" :key="type">
+      <b-col sm="3">
+        <label :for="`type-${type}`">Type {{ type }}:</label>
+      </b-col>
+      <b-col sm="9">
+        <b-form-input :id="`type-${type}`" :type="type"/>
+      </b-col>
+    </b-row>
   </b-container>
 </template>
+<style lang="scss" scoped>
+form {
+  padding: 10px;
+}
+</style>
+
+<script>
+export default {
+  data() {
+    return {
+      customer: {
+        fields: [
+          {
+            name: "name",
+            type: "text",
+            label: "Nom",
+            placeholder: "Entrez le nom",
+            required: true
+          },
+          {
+            name: "phone",
+            type: "text",
+            label: "Téléphone",
+            placeholder: "Entrez le téléphone",
+            maxlength: 10
+          },
+          {
+            name: "address1",
+            type: "text",
+            label: "Adresse",
+            placeholder: "Entrez l'adresse"
+          },
+          {
+            name: "address2",
+            type: "text",
+            label: "",
+            placeholder: "App."
+          },
+          {
+            name: "address3",
+            type: "text",
+            label: "Ville",
+            placeholder: "Entrez la ville"
+          },
+          {
+            name: "postalCode",
+            type: "postalcode",
+            label: "Code postal",
+            placeholder: "Entrez le code postal",
+            maxlength: 6,
+            pattern: "[A-Za-z][0-9][A-Za-z] [0-9][A-Za-z][0-9]"
+          }
+        ]
+      },
+      types: [
+        "text",
+        "password",
+        "email",
+        "number",
+        "url",
+        "tel",
+        "date",
+        `time`,
+        "range",
+        "color"
+      ]
+    };
+  }
+};
+</script>
