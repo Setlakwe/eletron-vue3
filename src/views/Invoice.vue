@@ -1,3 +1,4 @@
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBuGZRfpSvhhYcn-7dPahKkzhXAVrQUOsM&libraries=places"></script>
 <template>
   <b-container fluid>
     <h1>Facturation</h1>

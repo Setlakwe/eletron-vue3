@@ -1,3 +1,5 @@
+
+
 <template>
   <div id="app">
     <Navbar/>
@@ -36,3 +38,19 @@ export default {
   font-size: 1rem;
 }
 </style>
+
+<script>
+import Navbar from "@/components/Navbar.vue";
+export default {
+  name: "electron-app",
+  components: {
+    Navbar
+  },
+  computed: {
+    today: function() {
+      let date = new Date();
+      return date.toDateString();
+    }
+  }
+};
+</script>
