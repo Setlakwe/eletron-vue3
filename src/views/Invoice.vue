@@ -72,6 +72,7 @@ form {
 
 <script>
 export default {
+  computed: {},
   data() {
     return {
       salutation: null,
@@ -106,13 +107,8 @@ export default {
           ]
         },
         salesman: 0,
+        customerNumber: 0,
         customer: [
-          {
-            name: "name",
-            type: "text",
-            label: "Nom",
-            placeholder: "Entrez le nom"
-          },
           {
             name: "phone",
             type: "tel",
@@ -120,6 +116,13 @@ export default {
             placeholder: "Entrez le téléphone",
             maxlength: 10
           },
+          {
+            name: "name",
+            type: "text",
+            label: "Nom",
+            placeholder: "Entrez le nom"
+          },
+
           {
             name: "email",
             type: "email",
