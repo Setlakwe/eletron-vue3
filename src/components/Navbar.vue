@@ -1,18 +1,9 @@
 
 <template>
   <nav class>
-    <ul class="list-inline navbar-nav">
+    <ul class="list-inline navbar-nav" v-for="route in routes">
       <li class="list-inline-item">
-        <router-link to="/">Home</router-link>
-      </li>
-      <li class="list-inline-item">
-        <router-link to="/invoice">Invoice</router-link>
-      </li>
-      <li class="list-inline-item">
-        <router-link to="/configuration">Configuration</router-link>
-      </li>
-      <li class="list-inline-item">
-        <router-link to="/about">About</router-link>
+        <router-link :to="route.url">{{route.name}}</router-link>
       </li>
     </ul>
   </nav>
@@ -21,7 +12,15 @@
 
 <script>
 export default {
-  name: "Navbar"
+  name: "Navbar",
+  data() {
+    return {
+      routes: [
+        { name: "Invoice", url: "/invoice" },
+        { name: "Configuration", url: "/configuration" }
+      ]
+    };
+  }
 };
 </script>
 <style lang="scss" scoped>
