@@ -34,7 +34,7 @@ export default {
   margin-top: 0px;
 }
 #app-body {
-  margin-top: 60px;
+  margin-top: 20px;
   font-size: 1rem;
 }
 </style>
