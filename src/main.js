@@ -3,10 +3,11 @@ import App from './App.vue'
 import router from './router'
 // plugins
 import BootstrapVue from './plugins/bootstrap-vue'
-//import Vuelidate from './plugins/vuelidate'
-//import formLoading from './plugins/vue2-form-loading'
+import Vue2Filters from './plugins/vue2-filters'
 
-Vue.config.productionTip = false;
+
+
+Vue.config.productionTip = true;
 
 new Vue({
   router,

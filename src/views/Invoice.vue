@@ -1,4 +1,5 @@
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBuGZRfpSvhhYcn-7dPahKkzhXAVrQUOsM&libraries=places"></script>
+
 <template>
   <b-container fluid>
     <b-form>
@@ -45,14 +46,8 @@
               </b-form-group>
             </b-col>
           </b-form-row>
-          <b-form-group
-            label-cols="2"
-            label="Téléphone"
-            label-for="phone"
-            class="text-right"
-            horizontal="true"
-          >
-            <b-form-input id="phone" v-model="form.phone" type="phone" maxlength="10"/>
+          <b-form-group label-cols="2" label="Téléphone" label-for="phone" class="text-right">
+            <b-form-input id="phone" v-model="form.phone" type="tel" maxlength="10"/>
           </b-form-group>
           <b-form-row class="text-left">
             <b-col sm="9" offset="2">
@@ -65,48 +60,23 @@
               </b-form-group>
             </b-col>
           </b-form-row>
-          <b-form-group
-            label-cols="2"
-            label="Nom"
-            label-for="customerName"
-            class="text-right"
-            horizontal="true"
-          >
-            <b-form-input id="customerName" v-model="form.customerName" type="customerName"/>
+          <b-form-group label-cols="2" label="Nom" label-for="customerName" class="text-right">
+            <b-form-input id="customerName" v-model="form.customerName" type="text"/>
           </b-form-group>
-          <b-form-group
-            label-cols="2"
-            label="Adresse"
-            label-for="address1"
-            class="text-right"
-            horizontal="true"
-          >
-            <b-form-input id="address1" v-model="form.address1" type="address1"/>
+          <b-form-group label-cols="2" label="Adresse" label-for="address1" class="text-right">
+            <b-form-input id="address1" v-model="form.address1" type="text"/>
           </b-form-group>
-          <b-form-group
-            label-cols="2"
-            label
-            label-for="address2"
-            class="text-right"
-            horizontal="true"
-          >
-            <b-form-input id="address2" v-model="form.address2" type="address2"/>
+          <b-form-group label-cols="2" label label-for="address2" class="text-right">
+            <b-form-input id="address2" v-model="form.address2" type="text"/>
           </b-form-group>
-          <b-form-group
-            label-cols="2"
-            label="Ville"
-            label-for="address3"
-            class="text-right"
-            horizontal="true"
-          >
-            <b-form-input id="address3" v-model="form.address3" type="address3"/>
+          <b-form-group label-cols="2" label="Ville" label-for="address3" class="text-right">
+            <b-form-input id="address3" v-model="form.address3" type="text"/>
           </b-form-group>
           <b-form-group
             label-cols="2"
             label="Code postal"
             label-for="postalCode"
             class="text-right"
-            horizontal="true"
           >
             <b-form-input
               id="postalCode"
@@ -116,13 +86,7 @@
               pattern="[A-z][0-9][A-z][0-9][A-z][0-9]"
             />
           </b-form-group>
-          <b-form-group
-            label-cols="2"
-            label="Courriel"
-            label-for="email"
-            class="text-right"
-            horizontal="true"
-          >
+          <b-form-group label-cols="2" label="Courriel" label-for="email" class="text-right">
             <b-form-input id="email" v-model="form.email" type="email"/>
           </b-form-group>
         </div>
@@ -134,31 +98,48 @@
             </b-btn-group>
           </b-form-row>
           <b-form-row>
-            <table>
+            <table v-model="items" class="text-right">
               <tr>
                 <td>Items Count:</td>
                 <td>{{itemsCount}}</td>
               </tr>
               <tr>
                 <td>Item total:</td>
-                <td>{{itemstotal}}</td>
+                <td>{{itemstotal |currency }}</td>
               </tr>
               <tr>
                 <td>Taxes:</td>
-                <td>{{itemstaxes}}</td>
+                <td>{{itemstaxes | currency }}</td>
               </tr>
               <tr>
                 <td>Grand total:</td>
-                <td>{{grandtotal}}</td>
+                <td>{{grandtotal | currency }}</td>
               </tr>
             </table>
           </b-form-row>
         </b-col>
         <b-col sm="12">
-          <b-table :fields="fields" :hover="true" :items="items"></b-table>
+          <b-table :fields="fields" :hover="true" :items="items">
+            <template slot="actions" slot-scope="row">
+              <b-button
+                size="sm"
+                @click="deleteRow(row.item, row.index, $event.target)"
+                class="mr-1 danger"
+              >X</b-button>
+              <b-button
+                size="sm"
+                @click="info(row.item, row.index, $event.target)"
+                class="mr-1"
+              >Info modal</b-button>
+            </template>
+          </b-table>
         </b-col>
       </div>
     </b-form>
+    <!-- Info modal -->
+    <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
+      <pre>{{ modalInfo.content }}</pre>
+    </b-modal>
   </b-container>
 </template>
 <style lang="scss" scoped>
@@ -169,9 +150,16 @@ form {
 
 <script>
 export default {
-  computed: {},
   data() {
     return {
+      currentPage: 1,
+      perPage: 5,
+      pageOptions: [5, 10, 15],
+      sortBy: null,
+      sortDesc: false,
+      sortDirection: "asc",
+      filter: null,
+      modalInfo: { title: "", content: "" },
       options: {
         salutations: [
           { value: 1, text: "M." },
@@ -211,7 +199,7 @@ export default {
         country: "",
         email: "",
         items: ["test", "test", "test", "test"],
-        total: 10,
+        total: 0,
         rebate: 0
       },
       item: {},
@@ -227,7 +215,8 @@ export default {
         { discountPercentage: { label: "Escompte (%)" } },
         { discountAmount: { label: "Escompte ($)" } },
         { netPrice: { label: "Prix net" } },
-        { Price: { label: "Prix" } }
+        { price: { label: "Prix" } },
+        { actions: { label: "Actions" } }
       ],
       items: [],
       itemHeader: ["Tag", "Spcmd"],
@@ -259,9 +248,13 @@ export default {
     },
     itemstaxes: function() {
       if (this.items.length > 0) {
-        return this.items
-          .map(item => item.netPrice * 0.14975)
-          .reduce((total, current) => total + current);
+        return (
+          Math.round(
+            this.items
+              .map(item => item.netPrice * 0.14975)
+              .reduce((total, current) => total + current) * 100
+          ) / 100
+        );
       }
       return 0;
     },
@@ -270,6 +263,22 @@ export default {
     }
   },
   methods: {
+    resetModal() {
+      this.modalInfo.title = "";
+      this.modalInfo.content = "";
+    },
+    info(item, index, button) {
+      // this.modalInfo.title = `Row index: ${index}`;
+      let content = JSON.stringify(item, null, 2);
+      this.modalInfo.content = JSON.stringify(item, null, 2);
+      this.$root.$emit("bv::show::modal", "modalInfo", button);
+    },
+    deleteRow(item) {
+      let idx = this.items.indexOf(item);
+      if (idx !== -1) {
+        this.items.splice(idx, 1);
+      }
+    },
     greet: function(event) {
       // `this` inside methods point to the Vue instance
       alert("Hello " + this.name + "!");
@@ -289,7 +298,8 @@ export default {
         discountPercentage: 0,
         discountAmount: 0,
         netPrice: 20.95,
-        Price: ""
+        Price: "",
+        timestamp: Date.now()
       };
       item.price = item.netPrice * 1.14875;
       this.items.push(item);
