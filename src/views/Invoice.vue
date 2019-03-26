@@ -101,7 +101,7 @@
             <table v-model="items" class="text-right">
               <tr>
                 <td>Items Count:</td>
-                <td>{{itemsCount}}</td>
+                <td>{{itemsCount}} / {{numberOfInvoiceItems}}</td>
               </tr>
               <tr>
                 <td>Item total:</td>
@@ -116,10 +116,11 @@
                 <td>{{grandtotal | currency }}</td>
               </tr>
             </table>
+            <div>{{items}}</div>
           </b-form-row>
         </b-col>
         <b-col sm="12">
-          <InvoiceItems :fields="fields" :items="items"/>
+          <InvoiceItems :items="items"/>
         </b-col>
       </div>
     </b-form>
@@ -136,6 +137,10 @@ import InvoiceItems from "@/components/InvoiceItems.vue";
 export default {
   components: {
     InvoiceItems
+  },
+  mounted() {
+    this.addItem();
+    this.addItem();
   },
   data() {
     return {
@@ -190,21 +195,6 @@ export default {
         rebate: 0
       },
       item: {},
-      fields: [
-        { tagNumber: { label: "Étiquette" } },
-        { specialOrder: { label: "Commande Spéciale" } },
-        { quantity: { label: "Quantité" } },
-        { department: { label: "Rayon" } },
-        { vendor: { label: "Fournisseur" } },
-        { style: { label: "Style" } },
-        { description: { label: "Description " } },
-        { unitPrice: { label: "Prix unitaire" } },
-        { discountPercentage: { label: "Escompte (%)" } },
-        { discountAmount: { label: "Escompte ($)" } },
-        { netPrice: { label: "Prix net" } },
-        { price: { label: "Prix" } },
-        { actions: { label: "Actions" } }
-      ],
       items: [],
       itemHeader: ["Tag", "Spcmd"],
       fieldtypes: [
@@ -225,11 +215,22 @@ export default {
     itemsCount: function() {
       return this.items.length;
     },
+    numberOfInvoiceItems: function() {
+      if (this.items.length > 0) {
+        const count = this.items
+          .map(item => parseInt(item.quantity))
+          .reduce((total, current) => total + current);
+
+        return isNaN(count) ? 0 : count;
+      }
+      return 0;
+    },
     itemstotal: function() {
       if (this.items.length > 0) {
-        return this.items
+        const count = this.items
           .map(item => item.netPrice * item.quantity)
           .reduce((total, current) => total + current);
+        return isNaN(count) ? 0 : count;
       }
       return 0;
     },
@@ -238,7 +239,7 @@ export default {
         return (
           Math.round(
             this.items
-              .map(item => item.netPrice * 0.14975)
+              .map(item => item.netPrice * item.quantity * 0.14975)
               .reduce((total, current) => total + current) * 100
           ) / 100
         );
@@ -285,14 +286,15 @@ export default {
         discountPercentage: 0,
         discountAmount: 0,
         netPrice: 20.95,
-        Price: "",
-        timestamp: Date.now()
+        Price: ""
       };
-      item.price = item.netPrice * 1.14875;
+      item.price = item.netPrice * item.quantity * 1.14875;
       this.items.push(item);
     },
     removeItems: function() {
       this.items = [];
+
+      // this.items = [];
     }
   }
 };

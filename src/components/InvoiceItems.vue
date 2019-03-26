@@ -1,6 +1,9 @@
 <template>
   <div>
     <b-table :fields="fields" :hover="true" :items="items">
+      <template slot="quantity" slot-scope="row">
+        <b-input v-model="row.item.quantity" type="number" step="1"/>
+      </template>
       <template slot="actions" slot-scope="row">
         <b-button
           size="sm"
@@ -22,13 +25,31 @@
 </template>
 <script>
 export default {
-  props: ["items", "fields"],
+  props: ["items"],
   data() {
     return {
-      modalInfo: { title: "", content: "" }
+      modalInfo: { title: "", content: "" },
+      fields: [
+        { tagNumber: { label: "Étiquette" } },
+        { specialOrder: { label: "Commande Spéciale" } },
+        { quantity: { label: "Quantité" } },
+        { department: { label: "Rayon" } },
+        { vendor: { label: "Fournisseur" } },
+        { style: { label: "Style" } },
+        { description: { label: "Description " } },
+        { unitPrice: { label: "Prix unitaire" } },
+        { discountPercentage: { label: "Escompte (%)" } },
+        { discountAmount: { label: "Escompte ($)" } },
+        { netPrice: { label: "Prix net" } },
+        { price: { label: "Prix" } },
+        { actions: { label: "Actions" } }
+      ]
     };
   },
   methods: {
+    updateItemQuantity(item) {
+      console.log(item);
+    },
     resetModal() {
       this.modalInfo.title = "";
       this.modalInfo.content = "";
