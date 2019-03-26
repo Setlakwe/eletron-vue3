@@ -4,6 +4,8 @@
       <template slot="quantity" slot-scope="row">
         <b-input v-model="row.item.quantity" type="number" step="1"/>
       </template>
+      <template slot="price" slot-scope="row">{{price(row.item) | currency}}</template>
+      <template slot="unitPrice" slot-scope="row">{{row.item.unitPrice | currency}}</template>
       <template slot="actions" slot-scope="row">
         <b-button
           size="sm"
@@ -32,14 +34,14 @@ export default {
       fields: [
         { tagNumber: { label: "Étiquette" } },
         { specialOrder: { label: "Commande Spéciale" } },
-        { quantity: { label: "Quantité" } },
+        { quantity: { label: "QTÉ" } },
         { department: { label: "Rayon" } },
         { vendor: { label: "Fournisseur" } },
         { style: { label: "Style" } },
         { description: { label: "Description " } },
-        { unitPrice: { label: "Prix unitaire" } },
-        { discountPercentage: { label: "Escompte (%)" } },
-        { discountAmount: { label: "Escompte ($)" } },
+        { unitPrice: { label: "Prix unit." } },
+        { discountPercentage: { label: "Esc. (%)" } },
+        { discountAmount: { label: "Esc. ($)" } },
         { netPrice: { label: "Prix net" } },
         { price: { label: "Prix" } },
         { actions: { label: "Actions" } }
@@ -47,6 +49,9 @@ export default {
     };
   },
   methods: {
+    price: function(item) {
+      return item.quantity * item.netPrice;
+    },
     updateItemQuantity(item) {
       console.log(item);
     },
@@ -55,8 +60,6 @@ export default {
       this.modalInfo.content = "";
     },
     infoModal(item, index, button) {
-      // this.modalInfo.title = `Row index: ${index}`;
-      console.log(item);
       let content = JSON.stringify(item, null, 2);
       this.modalInfo.content = JSON.stringify(item, null, 2);
       this.$root.$emit("bv::show::modal", "modalInfo", button);
