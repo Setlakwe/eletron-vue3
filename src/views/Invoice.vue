@@ -119,27 +119,10 @@
           </b-form-row>
         </b-col>
         <b-col sm="12">
-          <b-table :fields="fields" :hover="true" :items="items">
-            <template slot="actions" slot-scope="row">
-              <b-button
-                size="sm"
-                @click="deleteRow(row.item, row.index, $event.target)"
-                class="mr-1 danger"
-              >X</b-button>
-              <b-button
-                size="sm"
-                @click="info(row.item, row.index, $event.target)"
-                class="mr-1"
-              >Info modal</b-button>
-            </template>
-          </b-table>
+          <InvoiceItems :fields="fields" :items="items"/>
         </b-col>
       </div>
     </b-form>
-    <!-- Info modal -->
-    <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
-      <pre>{{ modalInfo.content }}</pre>
-    </b-modal>
   </b-container>
 </template>
 <style lang="scss" scoped>
@@ -149,7 +132,11 @@ form {
 </style>
 
 <script>
+import InvoiceItems from "@/components/InvoiceItems.vue";
 export default {
+  components: {
+    InvoiceItems
+  },
   data() {
     return {
       currentPage: 1,
