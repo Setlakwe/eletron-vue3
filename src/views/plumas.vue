@@ -3,27 +3,27 @@
     <b-form @submit="filter">
       <b-col sm="4">
         <b-form-group label-cols="2" label="Fournisseur" label-for="VNDNR" class="text-right">
-          <b-form-input id="VNDNR" v-model="form.VNDNR" @keyup="filter"/>
+          <b-form-input id="VNDNR" v-model="form.VNDNR" @keyup="filter" trim/>
         </b-form-group>
       </b-col>
       <b-col sm="4">
         <b-form-group label-cols="2" label="Style" label-for="STYLE" class="text-right">
-          <b-form-input id="STYLE" v-model="form.STYLE" @keyup="filter"/>
+          <b-form-input id="STYLE" v-model="form.STYLE" @keyup="filter" trim/>
         </b-form-group>
       </b-col>
       <b-col sm="4">
         <b-form-group label-cols="2" label="Couleur" label-for="COLOR" class="text-right">
-          <b-form-input id="COLOR" v-model="form.COLOR" @keyup="filter"/>
+          <b-form-input id="COLOR" v-model="form.COLOR" @keyup="filter" trim/>
         </b-form-group>
       </b-col>
       <b-col sm="4">
         <b-form-group label-cols="2" label="Bonnet" label-for="CUPSZ" class="text-right">
-          <b-form-input id="CUPSZ" v-model="form.CUPSZ" @keyup="filter"/>
+          <b-form-input id="CUPSZ" v-model="form.CUPSZ" @keyup="filter" trim/>
         </b-form-group>
       </b-col>
       <b-col sm="4">
         <b-form-group label-cols="2" label="GRANDEUR" label-for="SIZEX" class="text-right">
-          <b-form-input id="SIZEX" v-model="form.SIZEX" @keyup="filter"/>
+          <b-form-input id="SIZEX" v-model="form.SIZEX" @keyup="filter" trim/>
         </b-form-group>
       </b-col>
       <b-btn type="submit">Rechercher</b-btn>
@@ -105,7 +105,21 @@ export default {
   methods: {
     filter: function(e) {
       e.preventDefault();
-      this.$root.$emit("bv::refresh::table", "my-table");
+      let where = [];
+      let qs = "";
+      if (this.form.VNDNR) where.push(`(VNDNR,like,~${this.form.VNDNR})`);
+      if (this.form.STYLE) where.push(`(STYLE,like,~${this.form.STYLE})`);
+      if (this.form.COLOR) where.push(`(COLOR,like,~${this.form.COLOR})`);
+      if (this.form.CUPSZ) where.push(`(CUPSZ,like,~${this.form.CUPSZ})`);
+      if (this.form.SIZEX) where.push(`(SIZEX,like,~${this.form.SIZEX})`);
+      if (where.length) {
+        let s = where.join("~and");
+        qs += `&_where=(${s})`;
+      }
+      if (qs !== this.queryString) {
+        this.queryString = qs;
+        this.$root.$emit("bv::refresh::table", "my-table");
+      }
     },
     myProvider: async function(ctx) {
       this.queryString = `?_p=${ctx.currentPage}&_size=${ctx.perPage}`;
@@ -119,7 +133,6 @@ export default {
         let s = where.join("~and");
         this.queryString += `&_where=(${s})`;
       }
-
       this.rows = await (this.rows = axios
         .get(`${apiUrl}/plumas/count/${this.queryString}`)
         .then(res => res.data[0].no_of_rows));
