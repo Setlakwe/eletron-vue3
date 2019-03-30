@@ -11,6 +11,14 @@ export default new Router({
       component: Home
     },
     {
+      path: '/plumas',
+      name: 'plumas',
+      // route level code-splitting
+      // this generates a separate chunk (invoice.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import( /* webpackChunkName: "invoice" */ './views/plumas.vue')
+    },
+    {
       path: '/invoice',
       name: 'invoice',
       // route level code-splitting

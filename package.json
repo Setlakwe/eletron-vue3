@@ -13,11 +13,13 @@
   },
   "main": "background.js",
   "dependencies": {
+    "axios": "^0.18.0",
     "bootstrap-vue": "^2.0.0-rc.15",
     "global": "^4.3.2",
     "jquery": "^3.3.1",
     "numeral": "^2.0.6",
     "vue": "^2.6.10",
+    "vue-axios": "^2.1.4",
     "vue-cli": "^2.9.6",
     "vue-router": "^3.0.2",
     "vue2-filters": "^0.5.1",

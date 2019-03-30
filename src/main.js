@@ -5,8 +5,6 @@ import router from './router'
 import BootstrapVue from './plugins/bootstrap-vue'
 import Vue2Filters from './plugins/vue2-filters'
 
-
-
 Vue.config.productionTip = true;
 
 new Vue({

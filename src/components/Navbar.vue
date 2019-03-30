@@ -17,6 +17,7 @@ export default {
     return {
       routes: [
         { name: "Invoice", url: "/invoice" },
+        { name: "plumas", url: "/plumas" },
         { name: "Configuration", url: "/configuration" }
       ]
     };
